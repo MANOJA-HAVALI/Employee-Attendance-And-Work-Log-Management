@@ -14,6 +14,7 @@ import com.example.Employee.Attendance.And.Work.Log.Management.mapper.WorkLogMap
 import com.example.Employee.Attendance.And.Work.Log.Management.repository.AttendanceRepository;
 import com.example.Employee.Attendance.And.Work.Log.Management.repository.UserRepository;
 import com.example.Employee.Attendance.And.Work.Log.Management.repository.WorkLogRepository;
+import com.example.Employee.Attendance.And.Work.Log.Management.service.EmailService;
 import com.example.Employee.Attendance.And.Work.Log.Management.service.WorkLogService;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +28,13 @@ public class WorkLogServiceImpl implements WorkLogService {
     private final WorkLogRepository workLogRepository;
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public WorkLogServiceImpl(WorkLogRepository workLogRepository, AttendanceRepository attendanceRepository, UserRepository userRepository) {
+    public WorkLogServiceImpl(WorkLogRepository workLogRepository, AttendanceRepository attendanceRepository, UserRepository userRepository, EmailService emailService) {
         this.workLogRepository = workLogRepository;
         this.attendanceRepository = attendanceRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     // ================= EMPLOYEE =================
@@ -74,12 +77,31 @@ public class WorkLogServiceImpl implements WorkLogService {
     // ================= MANAGER =================
     @Override
     public void approveWorkLog(Long workLogId, String remarks, Long managerId) {
-        WorkLog workLog = getWorkLogForManager(workLogId, managerId);
+//        WorkLog workLog = getWorkLogForManager(workLogId, managerId);
+//
+//        workLog.setStatus(WorkLogStatus.APPROVED);
+//        workLog.setManagerRemarks(remarks);
+//
+//        workLogRepository.save(workLog);
+        WorkLog workLog = workLogRepository.findById(workLogId)
+                .orElseThrow(()-> new ResourceNotFoundException("Work log not found"));
+
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Manager not found"));
 
         workLog.setStatus(WorkLogStatus.APPROVED);
         workLog.setManagerRemarks(remarks);
 
         workLogRepository.save(workLog);
+
+        // 📧 Send email
+        User employee = workLog.getUser();
+        emailService.sendWorkLogApprovedMail(
+               // employee.getEmail(),
+                "manoj@yopmail.com",
+                employee.getName(),
+                workLog.getWorkDate().toString()
+        );
     }
 
     @Override
@@ -87,13 +109,29 @@ public class WorkLogServiceImpl implements WorkLogService {
         if (remarks == null || remarks.isBlank()) {
             throw new InvalidAttendanceException("Remarks are mandatory for rejection");
         }
+        WorkLog workLog = workLogRepository.findById(workLogId)
+                .orElseThrow(() -> new ResourceNotFoundException("Work log not found"));
 
-        WorkLog workLog = getWorkLogForManager(workLogId, managerId);
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Manager not found"));
 
+//        WorkLog workLog = getWorkLogForManager(workLogId, managerId);
+//        workLog.setStatus(WorkLogStatus.REJECTED);
+//        workLog.setManagerRemarks(remarks);
+//        workLogRepository.save(workLog);
         workLog.setStatus(WorkLogStatus.REJECTED);
         workLog.setManagerRemarks(remarks);
 
         workLogRepository.save(workLog);
+
+        // 📧 Send email
+        User employee = workLog.getUser();
+        emailService.sendWorkLogRejectedMail(
+                employee.getEmail(),
+                employee.getName(),
+                workLog.getWorkDate().toString(),
+                remarks
+        );
     }
 
     // ================= COMMON =================
