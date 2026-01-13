@@ -61,7 +61,7 @@ public class WorkLogController {
     // ================= MANAGER APIs =================
 
     // Approve work log (Manager)
-    @PostMapping("/{workLogId}/approve")
+    @PostMapping("/approve/{workLogId}")
     public ResponseEntity<ApiResponse<Void>> approveWorkLog(
             @PathVariable Long workLogId,
             @RequestParam(required = false) String remarks,
@@ -79,7 +79,7 @@ public class WorkLogController {
     }
 
     // Reject work log (Manager)
-    @PostMapping("/{workLogId}/reject")
+    @PostMapping("/reject/{workLogId}")
     public ResponseEntity<ApiResponse<Void>> rejectWorkLog(
             @PathVariable Long workLogId,
             @RequestParam String remarks,

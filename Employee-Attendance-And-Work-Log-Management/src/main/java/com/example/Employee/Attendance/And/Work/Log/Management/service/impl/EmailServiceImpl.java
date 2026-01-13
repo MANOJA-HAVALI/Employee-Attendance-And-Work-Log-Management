@@ -17,6 +17,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendWorkLogApprovedMail(String to, String employeeName, String date) {
         SimpleMailMessage mail = new SimpleMailMessage();
+        //mail.setTo("manojyop@gmail.com");
         mail.setTo(to);
         mail.setSubject("Work Log Approved ");
         mail.setText(

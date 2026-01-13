@@ -29,21 +29,27 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         //Admin endpoints
-                        .requestMatchers("/api/admin/**"
-                                                ,"/api/attendance/getAttendanceById/**"
-                                                ,"/api/attendance/getAllAttendance/"
-                                                ,"/api/worklogs/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // Manager endpoints
-                        .requestMatchers("/api/attendance/**"
-                                                ,"/api/worklogs/**").hasRole("MANAGER")
+                        // manager and admin both have access to worklog approval
+                        .requestMatchers("/api/worklogs/**")
+                        .hasAnyRole("MANAGER","ADMIN","EMPLOYEE")
+
+                        // Attendance APIs (ADMIN, MANAGER, EMPLOYEE)
+                        .requestMatchers("/api/attendance/getAttendanceById/**")
+                        .hasAnyRole("ADMIN", "MANAGER", "EMPLOYEE")
+
+                        .requestMatchers("/api/attendance/getAllAttendance/**")
+                        .hasAnyRole("ADMIN", "MANAGER")
 
                         // Employee endpoints
                         .requestMatchers("/api/attendance/check-in/**"
-                                                ,"/api/attendance/check-out/**"
-                                                ,"/api/attendance/getAttendanceById/**"
-                                                ,"/api/worklogs/submit"
-                                                ,"/api/worklogs/my").hasRole("EMPLOYEE")
+                                                ,"/api/attendance/check-out/**").hasRole("EMPLOYEE")
+
+                        // Worklog approve - EMPLOYEE ONLY
+                        .requestMatchers("/api/worklogs/approve/**")
+                        .hasRole("EMPLOYEE")
+
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

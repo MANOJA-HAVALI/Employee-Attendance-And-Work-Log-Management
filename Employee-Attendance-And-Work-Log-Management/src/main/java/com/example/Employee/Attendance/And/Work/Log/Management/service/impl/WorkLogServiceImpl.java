@@ -97,8 +97,8 @@ public class WorkLogServiceImpl implements WorkLogService {
         // 📧 Send email
         User employee = workLog.getUser();
         emailService.sendWorkLogApprovedMail(
-               // employee.getEmail(),
-                "manoj@yopmail.com",
+                employee.getEmail(),
+                //"manoj@yopmail.com",
                 employee.getName(),
                 workLog.getWorkDate().toString()
         );
