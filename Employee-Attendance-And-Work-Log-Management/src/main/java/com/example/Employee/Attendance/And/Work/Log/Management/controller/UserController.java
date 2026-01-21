@@ -2,9 +2,12 @@ package com.example.Employee.Attendance.And.Work.Log.Management.controller;
 
 import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.CreateUserRequest;
 import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.responce.ApiResponse;
+import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.responce.UserResponse;
 import com.example.Employee.Attendance.And.Work.Log.Management.entity.User;
+import com.example.Employee.Attendance.And.Work.Log.Management.mapper.UserMapper;
 import com.example.Employee.Attendance.And.Work.Log.Management.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,9 @@ import java.util.List;
 @RequestMapping("/api/admin/users")
 public class UserController {
 
+    @Autowired
+    public UserMapper userMapper;
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -24,18 +30,22 @@ public class UserController {
 
     // CREATE USER
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<User>> createUser(
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @Valid @RequestBody CreateUserRequest request) {
 
         User user = userService.createUser(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        LocalDateTime.now(),
-                        HttpStatus.CREATED.value(),
-                        "Employee created successfully",
-                        user
-                ));
+        UserResponse response = userMapper.toResponse(user);
+
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setTimestamp(LocalDateTime.now());
+        apiResponse.setStatus(HttpStatus.CREATED.value());
+        apiResponse.setMessage("Employee created successfully");
+        apiResponse.setData(response);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(apiResponse);
     }
 
     //  GET USER BY ID

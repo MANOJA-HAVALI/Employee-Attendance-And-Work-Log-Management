@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("JWT Filter started for request: {} {}", request.getMethod(), request.getRequestURI());
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization"); //Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String jwt = authHeader.substring(7);
+            String jwt = authHeader.substring(7);  //Removes "Bearer " Extracts username/email from token claims
             String username = jwtService.extractUsername(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

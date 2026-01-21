@@ -74,7 +74,7 @@ public class UserMapper {
         response.setId(user.getId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
-        response.setRole(user.getRole().getDeclaringClass().getTypeName());
+        response.setRole(user.getRole().name());
         response.setEnabled(user.isEnabled());
         return response;
     }
