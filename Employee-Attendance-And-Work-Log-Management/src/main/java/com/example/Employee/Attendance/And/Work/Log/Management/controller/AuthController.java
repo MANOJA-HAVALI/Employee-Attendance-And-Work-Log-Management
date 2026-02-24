@@ -4,16 +4,17 @@ import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.Login
 import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.responce.ApiResponse;
 import com.example.Employee.Attendance.And.Work.Log.Management.dto.request.responce.LoginResponse;
 import com.example.Employee.Attendance.And.Work.Log.Management.service.AuthService;
-
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
@@ -33,13 +34,11 @@ public class AuthController {
     //  LOGIN
     @Operation(summary = "User Login", description = "user have to give correct credentials. ")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid
-            @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
 
         LoginResponse loginResponse = authService.login(request);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse<>(
                         LocalDateTime.now(),
                         HttpStatus.OK.value(),

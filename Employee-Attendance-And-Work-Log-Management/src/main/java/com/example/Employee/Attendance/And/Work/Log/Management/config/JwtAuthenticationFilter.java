@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("JWT Filter started for request: {} {}", request.getMethod(), request.getRequestURI());
 
-        final String authHeader = request.getHeader("Authorization"); //Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        final String authHeader = request.getHeader("Authorization"); //Authorization: Bearer eyJhbGciOiJIUzI1NiJ9... Reading Authorization Header
 
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -73,7 +73,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.info("User authenticated successfully: {}", username);
                 }
             }
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response); //It means “pass the request to the next filter (or controller) in the chain.”
+            // Request -> Filter 1 -> Filter 2 (JWT Filter) -> Spring Security Filter -> Controller ->Response
 
         }
         catch (ExpiredJwtException e) {

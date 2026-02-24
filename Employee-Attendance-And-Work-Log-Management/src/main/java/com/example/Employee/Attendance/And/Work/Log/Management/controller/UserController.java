@@ -43,9 +43,7 @@ public class UserController {
         apiResponse.setMessage("Employee created successfully");
         apiResponse.setData(response);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(apiResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
     //  GET USER BY ID
